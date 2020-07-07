@@ -3,7 +3,6 @@ import {Text, View, Image, StyleSheet, Dimensions} from 'react-native';
 import CustomHeader from '../components/CustomHeader';
 import CustomStatusBar from '../components/CustomStatusBar';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
-import ViewMoreText from 'react-native-view-more-text';
 import MovieTextDetail from '../components/MovieTextDetail';
 
 const MovieDetail = ({route}) => {
