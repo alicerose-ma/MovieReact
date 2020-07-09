@@ -3,18 +3,17 @@ import {Text, View, Image, StyleSheet, Dimensions} from 'react-native';
 import CustomHeader from '../components/CustomHeader';
 import CustomStatusBar from '../components/CustomStatusBar';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
-import ViewMoreText from 'react-native-view-more-text';
 import MovieTextDetail from '../components/MovieTextDetail';
+import Video from 'react-native-video';
 
 const MovieDetail = ({route}) => {
   const {id} = route.params;
   const [result, setResult] = useState({});
   const [numberLines, setNumberLines] = useState(3);
   const [viewOption, setViewOption] = useState('View More');
+  // const [viewOption, setViewOption] = useState('View More');
 
   const getMovie = id => {
-    console.log('movie detail');
-    console.log(id);
     setResult({
       id: '1',
       title:
@@ -49,8 +48,14 @@ const MovieDetail = ({route}) => {
       <CustomStatusBar backgroundColor="#90CAF9" barStyle="dark-content" />
       <CustomHeader leftButtonName="arrow-left" />
       <ScrollView style={styles.container}>
-        <Image style={styles.image} source={{uri: result.image_url}} />
-        <View style={styles.titleAndOverview}>
+        <View style={styles.overviewPart}>
+          <Video
+            source={{uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4'}}
+            style={styles.videoStyle}
+            resizeMode="stretch"
+            controls={true}
+            paused={true}
+          />
           <Text style={styles.title}>{result.title}</Text>
           <Text numberOfLines={numberLines} style={styles.overview}>
             {result.overview}
@@ -76,21 +81,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#d8d8d8',
-    marginBottom: 30,
-    borderWidth: 3,
-    borderColor: 'black',
   },
 
   showViewMoreLess: {
     marginLeft: 15,
     color: 'blue',
     fontWeight: 'bold',
+    paddingBottom: 15,
   },
 
-  titleAndOverview: {
+  overviewPart: {
+    flex: 1,
     backgroundColor: 'white',
-    marginTop: 20,
-    paddingVertical: 20,
   },
 
   detailStyle: {
@@ -105,6 +107,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginHorizontal: 10,
+    marginTop: 15,
   },
 
   overview: {
@@ -118,5 +121,10 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     alignSelf: 'center',
     marginTop: 20,
+  },
+
+  videoStyle: {
+    width: Dimensions.get('screen').width,
+    height: Dimensions.get('screen').width / 2,
   },
 });

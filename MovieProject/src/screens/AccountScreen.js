@@ -49,8 +49,6 @@ const styles = StyleSheet.create({
 
   scrollStyle: {
     marginBottom: 20,
-    borderWidth: 4,
-    borderColor: 'green',
   },
 
   detailStyle: {
@@ -62,8 +60,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: Dimensions.get('window').width / 2,
     height: Dimensions.get('window').width / 2,
-    borderColor: 'red',
-    borderWidth: 3,
     resizeMode: 'contain',
     marginBottom: 20,
     marginTop: 15,

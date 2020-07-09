@@ -32,12 +32,12 @@ const MovieItem = props => {
       <View style={styles.itemContainer}>
         <Image style={styles.image} source={{uri: props.item.image_url}} />
         <View style={styles.descriptionStyle}>
-          <Text style={styles.titleItem} numberOfLines={1} ellipsizeMode="tail">
+          <Text style={styles.titleItem}>
             {props.item.title}
           </Text>
           <Text
             style={styles.overviewItem}
-            numberOfLines={2}
+            numberOfLines={3}
             ellipsizeMode="tail">
             {props.item.overview}
           </Text>

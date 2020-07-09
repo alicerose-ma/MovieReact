@@ -1,6 +1,5 @@
 import React, {memo} from 'react';
 import {Text, StyleSheet, View, TouchableOpacity} from 'react-native';
-;
 
 const CustomButton = (props) => {
   console.log("buttom render");

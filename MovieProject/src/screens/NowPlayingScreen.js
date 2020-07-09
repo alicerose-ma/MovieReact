@@ -10,7 +10,7 @@ const MOVIE = [
     title:
       'Title Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
     overview:
-      'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+      'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
     image_url:
       'https://cdn.shopify.com/s/files/1/0057/3728/3618/products/4c177c2b7f7bb9a679f089bcb50f844e_3e89eb5d-ffbd-4033-a00f-e595a3ef2e2a_240x360_crop_center.progressive.jpg?v=1573587540',
   },
