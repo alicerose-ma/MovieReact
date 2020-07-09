@@ -30,56 +30,36 @@ import MovieScreen from './src/screens/Tab/MovieScreen';
 import FavoriteScreen from './src/screens/Tab/FavoriteScreen';
 import MovieDetail from './src/screens/MovieDetail';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import CustomDrawerItem from './src/components/CustomDrawerItem';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const DrawerNav = createDrawerNavigator();
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'choose_home': {
-      return {
-        ...state,
-        home: true,
-        profile: false,
-        nowplaying: false,
-      };
-    }
-    case 'choose_profile': {
-      return {
-        ...state,
-        home: false,
-        profile: true,
-        nowplaying: false,
-      };
-    }
-    case 'choose_nowplaying': {
-      return {
-        ...state,
-        home: false,
-        profile: false,
-        nowplaying: true,
-      };
-    }
-    default: {
-      return {
-        ...state,
-        home: true,
-        profile: false,
-        nowplaying: false,
-      };
-    }
-  }
-};
-
 const CustomDrawerContent = props => {
-  const [state, dispatch] = useReducer(reducer, {
-    home: true,
-    profile: false,
-    nowplaying: false,
-  });
-
-  const {home, profile, nowplaying} = state;
+  const [drawerArr, setDrawerArr] = useState([
+    {
+      id: 1,
+      icon: 'home',
+      label: 'Home2',
+      naviTo: 'BottomTab',
+      status: true,
+    },
+    {
+      id: 2,
+      icon: 'account',
+      label: 'Account2',
+      naviTo: 'Profile',
+      status: false,
+    },
+    {
+      id: 3,
+      icon: 'filmstrip',
+      label: 'Now Playing 2',
+      naviTo: 'NowPlaying',
+      status: false,
+    },
+  ]);
 
   return (
     <View style={{flex: 1}}>
@@ -104,51 +84,17 @@ const CustomDrawerContent = props => {
           </View>
         </View>
         <Drawer.Section>
-          <DrawerItem
-            icon={({color, size}) => (
-              <Icon name="home" color={color} size={size} />
-            )}
-            label="Home"
-            onPress={() => {
-              dispatch({type: 'choose_home'});
-              props.navigation.navigate('BottomTab');
-            }}
-            focused={home}
-            activeBackgroundColor="pink"
-            inactiveBackgroundColor="white"
-            activeTintColor="black"
-            inactiveTintColor="gray"
-          />
-          <DrawerItem
-            icon={({color, size}) => (
-              <Icon name="account" color={color} size={size} />
-            )}
-            label="Profile"
-            onPress={() => {
-              dispatch({type: 'choose_profile'});
-              props.navigation.navigate('Profile');
-            }}
-            focused={profile}
-            activeBackgroundColor="pink"
-            inactiveBackgroundColor="white"
-            activeTintColor="black"
-            inactiveTintColor="gray"
-          />
-          <DrawerItem
-            icon={({color, size}) => (
-              <Icon name="filmstrip" color={color} size={size} />
-            )}
-            label="Now Playing"
-            onPress={() => {
-              dispatch({type: 'choose_nowplaying'});
-              props.navigation.navigate('NowPlaying');
-            }}
-            focused={nowplaying}
-            activeBackgroundColor="pink"
-            inactiveBackgroundColor="white"
-            activeTintColor="black"
-            inactiveTintColor="gray"
-          />
+          {drawerArr.map(drawerItem => {
+            return (
+              <CustomDrawerItem
+                id={drawerItem.id}
+                label={drawerItem.label}
+                icon={drawerItem.icon}
+                navigation={props.navigation}
+                naviTo={drawerItem.naviTo}
+              />
+            );
+          })}
         </Drawer.Section>
       </DrawerContentScrollView>
       <Drawer.Section style={styles.bottomDrawerSection}>
@@ -179,19 +125,7 @@ const Home = () => {
       initialRouteName="BottomTab"
       drawerContent={props => <CustomDrawerContent {...props} />}
       screenOptions={{swipeEnabled: false}}>
-      <DrawerNav.Screen
-        name="BottomTab"
-        component={BottomTab}
-        options={{
-          title: 'Home',
-          drawerIcon: () => (
-            <Image
-              style={styles.drawerIcon}
-              source={require('./asset/icon/home.png')}
-            />
-          ),
-        }}
-      />
+      <DrawerNav.Screen name="BottomTab" component={BottomTab} />
       <DrawerNav.Screen name="Profile" component={AccountScreen} />
       <DrawerNav.Screen name="NowPlaying" component={NowPlayingScreen} />
       <DrawerNav.Screen name="Search" component={Search} />
@@ -270,3 +204,127 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 });
+
+
+
+// updateDrawerStatus={id => {
+//   drawerArr.map(eachDrawerItem => {
+//     if (eachDrawerItem.id === id) {
+//       eachDrawerItem.status = true;
+//     } else {
+//       eachDrawerItem.status = false;
+//     }
+//   });
+// }}
+// status={drawerItem.status}
+
+
+
+
+// const [state, dispatch] = useReducer(reducer, {
+//   home: true,
+//   profile: false,
+//   nowplaying: false,
+// });
+
+// const {home, profile, nowplaying} = state;
+
+// function _mapDrawerItem() {
+//   console.log("mapping");
+//   drawerArr.map(drawerItem => {
+//     return (
+//       <CustomDrawerItem
+//         id={drawerItem.id}
+//         label={drawerItem.label}
+//         icon={drawerItem.icon}
+//         navigation={props.navigation}
+//         naviTo={drawerItem.naviTo}
+//       />
+//     );
+//   });
+// }
+
+{
+  /* <DrawerItem
+icon={({color, size}) => (
+  <Icon name="home" color={color} size={size} />
+)}
+label="Home"
+onPress={() => {
+  dispatch({type: 'choose_home'});
+  props.navigation.navigate('BottomTab');
+}}
+focused={home}
+activeBackgroundColor="pink"
+inactiveBackgroundColor="white"
+activeTintColor="black"
+inactiveTintColor="gray"
+/>
+<DrawerItem
+icon={({color, size}) => (
+  <Icon name="account" color={color} size={size} />
+)}
+label="Profile"
+onPress={() => {
+  dispatch({type: 'choose_profile'});
+  props.navigation.navigate('Profile');
+}}
+focused={profile}
+activeBackgroundColor="pink"
+inactiveBackgroundColor="white"
+activeTintColor="black"
+inactiveTintColor="gray"
+/>
+<DrawerItem
+icon={({color, size}) => (
+  <Icon name="filmstrip" color={color} size={size} />
+)}
+label="Now Playing"
+onPress={() => {
+  dispatch({type: 'choose_nowplaying'});
+  props.navigation.navigate('NowPlaying');
+}}
+focused={nowplaying}
+activeBackgroundColor="pink"
+inactiveBackgroundColor="white"
+activeTintColor="black"
+inactiveTintColor="gray"
+/> */
+}
+
+// const reducer = (state, action) => {
+//   switch (action.type) {
+//     case 'choose_home': {
+//       return {
+//         ...state,
+//         home: true,
+//         profile: false,
+//         nowplaying: false,
+//       };
+//     }
+//     case 'choose_profile': {
+//       return {
+//         ...state,
+//         home: false,
+//         profile: true,
+//         nowplaying: false,
+//       };
+//     }
+//     case 'choose_nowplaying': {
+//       return {
+//         ...state,
+//         home: false,
+//         profile: false,
+//         nowplaying: true,
+//       };
+//     }
+//     default: {
+//       return {
+//         ...state,
+//         home: true,
+//         profile: false,
+//         nowplaying: false,
+//       };
+//     }
+//   }
+// };

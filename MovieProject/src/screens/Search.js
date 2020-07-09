@@ -14,7 +14,7 @@ const Search = () => {
   return (
     <>
       <CustomStatusBar backgroundColor="#90CAF9" barStyle="dark-content" />
-      <CustomHeader title="Search" leftButtonName="bars" />
+      <CustomHeader title="Search" leftButtonName="arrow-left" />
       <View style={styles.container}>
         <SearchBar
           term={searchTerm}
