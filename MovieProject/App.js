@@ -1,9 +1,19 @@
 import 'react-native-gesture-handler';
-import * as React from 'react';
-import {StyleSheet} from 'react-native';
+import React, {useState, useReducer} from 'react';
+import {StyleSheet, Image, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator, HeaderTitle} from '@react-navigation/stack';
-
+import {MovieProvider} from './src/context/MovieContext';
+import {
+  Avatar,
+  Title,
+  Caption,
+  Paragraph,
+  Drawer,
+  Text,
+  TouchableRipple,
+  Switch,
+} from 'react-native-paper';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -19,23 +29,138 @@ import Search from './src/screens/Search';
 import MovieScreen from './src/screens/Tab/MovieScreen';
 import FavoriteScreen from './src/screens/Tab/FavoriteScreen';
 import MovieDetail from './src/screens/MovieDetail';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-const Drawer = createDrawerNavigator();
+const DrawerNav = createDrawerNavigator();
 
-const DrawerWithLogoutButton = props => {
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'choose_home': {
+      return {
+        ...state,
+        home: true,
+        profile: false,
+        nowplaying: false,
+      };
+    }
+    case 'choose_profile': {
+      return {
+        ...state,
+        home: false,
+        profile: true,
+        nowplaying: false,
+      };
+    }
+    case 'choose_nowplaying': {
+      return {
+        ...state,
+        home: false,
+        profile: false,
+        nowplaying: true,
+      };
+    }
+    default: {
+      return {
+        ...state,
+        home: true,
+        profile: false,
+        nowplaying: false,
+      };
+    }
+  }
+};
+
+const CustomDrawerContent = props => {
+  const [state, dispatch] = useReducer(reducer, {
+    home: true,
+    profile: false,
+    nowplaying: false,
+  });
+
+  const {home, profile, nowplaying} = state;
+
   return (
-    <DrawerContentScrollView
-      {...props}
-      contentContainerStyle={styles.contentStyle}>
-      <DrawerItemList {...props} />
-      <DrawerItem
-        label="Logout"
-        onPress={() => props.navigation.popToTop()}
-        style={styles.drawerItemStyle}
-      />
-    </DrawerContentScrollView>
+    <View style={{flex: 1}}>
+      <DrawerContentScrollView {...props}>
+        <View style={{marginBottom: 20}}>
+          <View style={styles.userContent}>
+            <Avatar.Image
+              source={{
+                uri:
+                  'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQTdCoprhau34VQywFn96jHOVdaIbprk6neww&usqp=CAU',
+              }}
+              size={50}
+            />
+            <View style={styles.userInfo}>
+              <Title>Emily</Title>
+              <Caption>Alien</Caption>
+            </View>
+          </View>
+          <View style={styles.memberShip}>
+            <Caption style={styles.caption}> Member Card ID</Caption>
+            <Paragraph style={styles.paragraph}>09090909090909090</Paragraph>
+          </View>
+        </View>
+        <Drawer.Section>
+          <DrawerItem
+            icon={({color, size}) => (
+              <Icon name="home" color={color} size={size} />
+            )}
+            label="Home"
+            onPress={() => {
+              dispatch({type: 'choose_home'});
+              props.navigation.navigate('BottomTab');
+            }}
+            focused={home}
+            activeBackgroundColor="pink"
+            inactiveBackgroundColor="white"
+            activeTintColor="black"
+            inactiveTintColor="gray"
+          />
+          <DrawerItem
+            icon={({color, size}) => (
+              <Icon name="account" color={color} size={size} />
+            )}
+            label="Profile"
+            onPress={() => {
+              dispatch({type: 'choose_profile'});
+              props.navigation.navigate('Profile');
+            }}
+            focused={profile}
+            activeBackgroundColor="pink"
+            inactiveBackgroundColor="white"
+            activeTintColor="black"
+            inactiveTintColor="gray"
+          />
+          <DrawerItem
+            icon={({color, size}) => (
+              <Icon name="filmstrip" color={color} size={size} />
+            )}
+            label="Now Playing"
+            onPress={() => {
+              dispatch({type: 'choose_nowplaying'});
+              props.navigation.navigate('NowPlaying');
+            }}
+            focused={nowplaying}
+            activeBackgroundColor="pink"
+            inactiveBackgroundColor="white"
+            activeTintColor="black"
+            inactiveTintColor="gray"
+          />
+        </Drawer.Section>
+      </DrawerContentScrollView>
+      <Drawer.Section style={styles.bottomDrawerSection}>
+        <DrawerItem
+          icon={({color, size}) => (
+            <Icon name="exit-to-app" color={color} size={size} />
+          )}
+          label="Sign Out"
+          onPress={() => props.navigation.popToTop()}
+        />
+      </Drawer.Section>
+    </View>
   );
 };
 
@@ -50,35 +175,51 @@ const BottomTab = () => {
 
 const Home = () => {
   return (
-    <Drawer.Navigator
+    <DrawerNav.Navigator
       initialRouteName="BottomTab"
-      drawerContent={props => <DrawerWithLogoutButton {...props} />}
+      drawerContent={props => <CustomDrawerContent {...props} />}
       screenOptions={{swipeEnabled: false}}>
-      <Drawer.Screen name="Account" component={AccountScreen} />
-      <Drawer.Screen
+      <DrawerNav.Screen
         name="BottomTab"
         component={BottomTab}
-        options={{title: 'Home'}}
+        options={{
+          title: 'Home',
+          drawerIcon: () => (
+            <Image
+              style={styles.drawerIcon}
+              source={require('./asset/icon/home.png')}
+            />
+          ),
+        }}
       />
-      <Drawer.Screen name="Now Playing" component={NowPlayingScreen} />
-    </Drawer.Navigator>
+      <DrawerNav.Screen name="Profile" component={AccountScreen} />
+      <DrawerNav.Screen name="NowPlaying" component={NowPlayingScreen} />
+      <DrawerNav.Screen name="Search" component={Search} />
+    </DrawerNav.Navigator>
   );
 };
 
-export default function App() {
+const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="Login"
         screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Search" component={Search} />
+        <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="MovieDetail" component={MovieDetail} />
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
+
+export default () => {
+  return (
+    <MovieProvider>
+      <App />
+    </MovieProvider>
+  );
+};
 
 const styles = StyleSheet.create({
   logoutButton: {
@@ -86,12 +227,46 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
 
-  contentStyle: {
-    flex: 1,
-  },
-
   drawerItemStyle: {
     position: 'absolute',
     bottom: 30,
+  },
+
+  drawerIcon: {
+    width: 25,
+    height: 25,
+  },
+
+  drawerSection: {
+    marginTop: 15,
+  },
+
+  userContent: {
+    paddingLeft: 30,
+    flexDirection: 'row',
+  },
+
+  userInfo: {
+    paddingLeft: 20,
+  },
+
+  bottomDrawerSection: {
+    marginBottom: 15,
+    marginLeft: 10,
+  },
+
+  caption: {
+    fontSize: 16,
+  },
+
+  paragraph: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginRight: 3,
+  },
+
+  memberShip: {
+    alignItems: 'center',
+    marginTop: 10,
   },
 });

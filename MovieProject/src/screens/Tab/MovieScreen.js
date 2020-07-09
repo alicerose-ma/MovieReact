@@ -1,15 +1,24 @@
-import React, {memo} from 'react';
-import {Text, StyleSheet, View, Image, Dimensions} from 'react-native';
+import React, {memo, useContext} from 'react';
+import {
+  Text,
+  StyleSheet,
+  View,
+  Image,
+  Dimensions,
+  FlatList,
+} from 'react-native';
 import CustomHeader from '../../components/CustomHeader';
 import CustomStatusBar from '../../components/CustomStatusBar';
 import {ScrollView} from 'react-native-gesture-handler';
 import HMovieList from '../../components/HMovieList';
+import MovieContext from '../../context/MovieContext';
 
 const DATA1 = [
   {
     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'First Item',
-    image_url: 'https://cdn.onebauer.media/one/empire-images/features/59e8d795405a5c6805947751/44%20Fear%20and%20Loathing%20in%20Las%20Vegas.jpg?quality=50&width=1000&ratio=1-1&resizeStyle=aspectfit&format=jpg',
+    title: 'First Item FirstItem ALice OK ',
+    image_url:
+      'https://cdn.onebauer.media/one/empire-images/features/59e8d795405a5c6805947751/44%20Fear%20and%20Loathing%20in%20Las%20Vegas.jpg?quality=50&width=1000&ratio=1-1&resizeStyle=aspectfit&format=jpg',
   },
   {
     id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
@@ -23,13 +32,20 @@ const DATA1 = [
     image_url:
       'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQl18fcJa9z_X9Tk72IvCBBSSWk6TPG98YYPw&usqp=CAU',
   },
+  {
+    id: '58694a0f-3da1-471f-bd96-24343fhf',
+    title: 'Third and Half Item',
+    image_url:
+      'https://www.washingtonpost.com/graphics/2019/entertainment/oscar-nominees-movie-poster-design/img/star-is-born-web.jpg',
+  },
 ];
 
 const DATA2 = [
   {
     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
     title: 'Four Item',
-    image_url: 'https://cdn.onebauer.media/one/empire-images/features/59e8d795405a5c6805947751/44%20Fear%20and%20Loathing%20in%20Las%20Vegas.jpg?quality=50&width=1000&ratio=1-1&resizeStyle=aspectfit&format=jpg',
+    image_url:
+      'https://cdn.onebauer.media/one/empire-images/features/59e8d795405a5c6805947751/44%20Fear%20and%20Loathing%20in%20Las%20Vegas.jpg?quality=50&width=1000&ratio=1-1&resizeStyle=aspectfit&format=jpg',
   },
   {
     id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
@@ -43,9 +59,17 @@ const DATA2 = [
     image_url:
       'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQl18fcJa9z_X9Tk72IvCBBSSWk6TPG98YYPw&usqp=CAU',
   },
+  {
+    id: '58694a0f-3da1-471f-bd96-24343fhf',
+    title: 'Seven Item',
+    image_url:
+      'https://www.washingtonpost.com/graphics/2019/entertainment/oscar-nominees-movie-poster-design/img/star-is-born-web.jpg',
+  },
 ];
 
 const MovieScreen = () => {
+  const movieList = useContext(MovieContext);
+
   return (
     <>
       <CustomStatusBar backgroundColor="#90CAF9" barStyle="dark-content" />
@@ -54,7 +78,7 @@ const MovieScreen = () => {
         leftButtonName="bars"
         rightButtonName="search"
       />
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.mainThumbContainer}>
           <Text style={styles.mainMovieText}>New Movie</Text>
           <Image
@@ -82,8 +106,6 @@ const styles = StyleSheet.create({
   mainThumb: {
     width: Dimensions.get('window').width / 2,
     height: ((Dimensions.get('window').width / 2) * 4) / 3,
-    borderColor: 'red',
-    borderWidth: 3,
     resizeMode: 'contain',
   },
 
