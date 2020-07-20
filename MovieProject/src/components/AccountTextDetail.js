@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View, StyleSheet} from 'react-native';
+import {Text, View, StyleSheet, Platform} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 
 const AccountTextDetail = props => {
@@ -22,8 +22,10 @@ export default AccountTextDetail;
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: 'white',
-    padding: 15,
+    paddingHorizontal: 15,
+    paddingVertical: Platform.OS === 'ios' ? 15 : 5,
     borderWidth: StyleSheet.hairlineWidth,
     borderStyle: 'dotted',
   },
