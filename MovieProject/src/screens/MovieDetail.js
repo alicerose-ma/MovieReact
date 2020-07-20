@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+ import React, {useEffect, useState} from 'react';
 import {Text, View, Image, StyleSheet, Dimensions} from 'react-native';
 import CustomHeader from '../components/CustomHeader';
 import CustomStatusBar from '../components/CustomStatusBar';

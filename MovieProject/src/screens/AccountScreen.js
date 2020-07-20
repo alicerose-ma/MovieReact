@@ -19,21 +19,19 @@ const AccountScreen = () => {
 
   useEffect(() => {
     setAccount(ACCOUNT);
-  }, []);
+  }, [account]);
 
   return (
     <>
       <CustomStatusBar backgroundColor="#90CAF9" barStyle="dark-content" />
       <CustomHeader title="Account" leftButtonName="bars" />
-      <View style={styles.container}>
-        <Image style={styles.avatar} source={{uri: account.image_avatar}} />
         <ScrollView style={styles.scrollStyle}>
+            <Image style={styles.avatar} source={{uri: account.image_avatar}} />
             <AccountTextDetail title="Name" isHidden={false} value={account.name} placeHolder="Your Name"/>
             <AccountTextDetail title="Password" isHidden={true} value={account.password} placeHolder="Password"/>
             <AccountTextDetail title="Address" isHidden={false} value={account.address} placeHolder="Address"/>
             <AccountTextDetail title="Phone" isHidden={false} value={account.phone} placeHolder="Your Phone"/>
         </ScrollView>
-      </View>
     </>
   );
 };
@@ -41,13 +39,9 @@ const AccountScreen = () => {
 export default memo(AccountScreen);
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scrollStyle: {
     marginBottom: 20,
     backgroundColor: '#d8d8d8',
-  },
-
-  scrollStyle: {
     marginBottom: 20,
   },
 
