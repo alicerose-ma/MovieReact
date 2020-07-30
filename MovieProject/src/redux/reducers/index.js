@@ -1,10 +1,9 @@
 import {combineReducers} from 'redux'
-import LibraryReducer from './LibraryReducer'
 import AuthReducer from './AuthReducer'
+import RootReducer from './RootReducer'
 
 export default combineReducers({
-    auth: AuthReducer
+    auth: AuthReducer,
+    root: RootReducer,
 })
 
-//console.log(store.getState())
-// {libraries: []}

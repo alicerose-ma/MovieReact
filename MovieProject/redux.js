@@ -10,19 +10,29 @@ import { View, Text } from 'react-native';
 import ReduxThunk from 'redux-thunk'
 import createSagaMiddleware from 'redux-saga'
 import { Button } from 'react-native-paper';
-// import rootSaga from
+// import RootSaga from './src/redux/sagas/rootSaga'
+import sagas from './src/redux/sagas/sagas'
 
 const Stack = createStackNavigator();
 const sagaMiddleware = createSagaMiddleware();
 
-// sagaMiddleware.run()
+
+import { createEpicMiddleware } from 'redux-observable';
+import {rootEpic} from './src/redux/observable/epic';
+const epicMiddleware = createEpicMiddleware(rootEpic);
 
 const Redux = () => {
-  const store = createStore(reducers, {}, applyMiddleware(ReduxThunk))
-  // const store = createStore(reducers, {}, applyMiddleware(sagaMiddleware))
+  // const store = createStore(reducers, {}, applyMiddleware(ReduxThunk))
+
+  const store = createStore(reducers, {}, applyMiddleware(sagaMiddleware))
+  sagaMiddleware.run(sagas)
+
+  // const store = createStore(reducers, {}, applyMiddleware(epicMiddleware))
+  // epicMiddleware.run(rootEpic)
 
   return (
-    <Provider store={store}>
+    // <Provider store={store}>
+      <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Login"

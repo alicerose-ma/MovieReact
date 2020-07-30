@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react'
-import createDataContext from './createDataContext'
+import createDataContext from '../../hookAndContext/context/createDataContext'
 
 
 const blogReducer = (state, action) => {

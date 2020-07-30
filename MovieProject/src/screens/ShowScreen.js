@@ -1,6 +1,6 @@
 import React , {useContext} from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import {Context as BlogContent} from '../hookAndContext/BlogContext';
+import {Context as BlogContent} from '../context/draft/BlogContext';
 
 const ShowScreen = ({route}) => {
     const {state} = useContext(BlogContent)
