@@ -36,14 +36,14 @@ const MovieItem = ({ item, action, button }) => {
       <View style={styles.itemContainer}>
         <View style={{flex: 3}}>
         <TouchableOpacity
-              onPress={() => navigation.navigate('MovieDetail', { id: item.id })}>
+              onPress={() => navigation.push('MovieDetail', { id: item.id })}>
         <Image style={styles.image} source={{ uri: movieImage() }} />
         </TouchableOpacity>
         </View>
  
         <View style={{flex: 5}} >
         <TouchableOpacity
-              onPress={() => navigation.navigate('MovieDetail', { id: item.id })}>
+              onPress={() => navigation.push('MovieDetail', { id: item.id })}>
             <Text style={styles.titleItem}>
             {item.title}
             </Text>
