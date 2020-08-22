@@ -1,79 +1,152 @@
-import React, {Component} from 'react';
-import {Text, StyleSheet, View} from 'react-native';
+
+import React, { useEffect, useLayoutEffect, useState, memo } from 'react';
+import { connect, useDispatch } from 'react-redux'
+
+
+import { Text, StyleSheet, View, StatusBar, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import FormInputText from '../components/FormInputText';
 import CustomButton from '../components/CustomButton';
+import { startLoading, stopLoading, toggleNetwork, createSessionId } from '../actions/rootActions'
+import Loading from '../components/Loading';
+import DefaultError from '../components/DefaultError';
+import NetInfo from "@react-native-community/netinfo";
+import { ACCOUNT_TYPE } from '../commons/types'
+import { loadHomeDependsOnNetwork } from '../commons/commonAction'
+import CustomStatusBar from '../components/CustomStatusBar';
+// import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import DismissKeyboard from '../components/DismissKeyboard';
 
-export default class LoginScreen extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      username: '',
-      password: '',
-      errorMessage: '',
-    };
+const LoginScreen = (props) => {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [errMess, setErrMess] = useState('')
+  const dispatch = useDispatch()
+  const [privateLoading, setprivateLoading] = useState(false)
+
+  // register login
+  useEffect(() => {
+    const registerNetwork = NetInfo.addEventListener(state => {
+      dispatch(toggleNetwork(state.isConnected))
+      // console.log(("is Connected", state.isConnected));
+    });
+    return () => {
+      registerNetwork()
+    }
+  }, []);
+
+  useEffect(() => {
+    if (props.availableNetwork) {
+      // dispatch(startLoading())
+      getLoginData()
+    }
+  }, [props.availableNetwork])
+
+  const login = () => {
+    Keyboard.dismiss()
+    setprivateLoading(true)
+    dispatch(startLoading())
+    dispatch({
+      type: ACCOUNT_TYPE.LOGIN, payload: {
+        username: username,
+        password: password,
+        cb: (res) => {
+          dispatch(stopLoading())
+          setprivateLoading(false)
+          if (!res.success) {
+            setErrMess(res.errMessage)
+          } else {
+            setValue(username, password, res.data.session_id)
+            // dispatch(createSessionId(sessionId))
+          }
+        }
+      }
+    })
   }
 
-  _onUsernameChange = newTerm => {
-    this.setState({
-      username: newTerm,
-    });
-  };
+  // console.log("SESSION ID", props.sessionId);
 
-  _onPasswordChange = newTerm => {
-    this.setState({
-      password: newTerm,
-    });
-  };
-
-  _onPressButton = () => {
-    this.props.navigation.navigate('Home');
-    // if (this.state.username.trim() != '') {
-    //   if (this.state.password.trim() != '') {
-    //     if (this.state.username === user.username && this.state.password === user.password) {
-    //       this._setErrorMessage('correct')
-    //       this.props.navigation.navigate('Drawer')
-    //     } else {s
-    //       this._setErrorMessage('incorrect')
-    //     }
-    //   } else {
-    //     this._setErrorMessage('password can not empty')
-    //   }
-    // } else {
-    //   this._setErrorMessage('username can not empty')
-    // }
-  };
-
-  _setErrorMessage(message) {
-    this.setState({
-      errorMessage: message,
-    });
+  const setValue = async (username, password, sessionId) => {
+    try {
+      await AsyncStorage.setItem('username', username);
+      await AsyncStorage.setItem('password', password);
+      await AsyncStorage.setItem('sessionId', sessionId);
+      await props.navigation.navigate("Home")
+    } catch (e) {
+      console.log("can not store login data", e);
+    }
   }
 
-  render() {
+  const getLoginData = async () => {
+    try {
+      const username = await AsyncStorage.getItem('username')
+      const password = await AsyncStorage.getItem('password')
+      const sessionId = await AsyncStorage.getItem('sessionId')
+      // const username = null
+      // const password = null
+      // console.log("LOGIN", username, password, sessionId);
+      dispatch(stopLoading())
+      if (username !== null && password != null) {
+        // console.log("LOGIN", props.sessionId);
+        props.navigation.navigate("Home")
+
+      }
+    } catch (e) {
+      console.log("can not get login data", e);
+    }
+  }
+
+  const handleErr = () => {
     return (
-      <View style={styles.container}>
-        <FormInputText
-          term={this.state.username}
-          placeHolder="username"
-          isHidden={false}
-          onTermChange={this._onUsernameChange}
-        />
-        <FormInputText
-          term={this.state.password}
-          placeHolder="password"
-          isHidden={true}
-          onTermChange={this._onPasswordChange}
-        />
-        <CustomButton buttonTitle="Login" pressButton={this._onPressButton} />
-        {this.state.errorMessage ? (
-          <Text style={styles.errorMessageStyle}>
-            {this.state.errorMessage}
-          </Text>
-        ) : null}
+      <TouchableWithoutFeedback
+          onPress={() => Keyboard.dismiss()}>
+      <View style={{ flex: 1 }}>
+        <CustomStatusBar backgroundColor="#90CAF9" />
+        <StatusBar barStyle="dark-content" />
+        
+          <View style={styles.container}>
+            <FormInputText
+              placeHolder="username"
+              isHidden={false}
+              onTermChange={text => setUsername(text)}
+            />
+            <FormInputText
+              placeHolder="password"
+              isHidden={true}
+              onTermChange={text => setPassword(text)}
+            />
+            <CustomButton buttonTitle="Login" pressButton={() => login()} />
+            {errMess ? (
+              <Text style={styles.errorMessageStyle}>
+                {errMess}
+              </Text>
+            ) : null}
+          </View>
+     
       </View>
-    );
+         </TouchableWithoutFeedback>
+    )
+  }
+
+
+  return (
+    <>
+      {loadHomeDependsOnNetwork(props.availableNetwork, loadHomeDependsOnNetwork, handleErr)}
+      {props.isLoading ? <Loading /> : null}
+    </>
+  );
+}
+
+const mapStateToProps = state => {
+  return {
+    isLoading: state.root.isLoading,
+    availableNetwork: state.root.availableNetwork,
+    sessionId: state.root.sessionId
   }
 }
+
+export default connect(mapStateToProps)(memo(LoginScreen));
+
 
 const styles = StyleSheet.create({
   container: {
@@ -90,7 +163,4 @@ const styles = StyleSheet.create({
   },
 });
 
-const user = {
-  username: 'abc',
-  password: '123',
-};
+

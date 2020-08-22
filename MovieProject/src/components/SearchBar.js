@@ -54,5 +54,6 @@ const styles = StyleSheet.create({
   inputStyle: {
     fontSize: 18,
     flex: 1,
+    color: 'black'
   },
 });

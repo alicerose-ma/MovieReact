@@ -1,42 +1,52 @@
-import React, {useState, memo, useEffect} from 'react';
-import {View, Text, StyleSheet, Image, Dimensions} from 'react-native';
+import React, { useState, memo, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import CustomHeader from '../components/CustomHeader';
 import CustomStatusBar from '../components/CustomStatusBar';
-import {ScrollView} from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-gesture-handler';
 import AccountTextDetail from '../components/AccountTextDetail';
+import { connect, useDispatch } from 'react-redux'
+import DefaultError from '../components/DefaultError';
+import { loadHomeDependsOnNetwork } from '../commons/commonAction'
 
-const ACCOUNT = {
-  name: 'Alice',
-  password: '123',
-  address: 'ABC',
-  phone: '09xxx',
-  image_avatar:
-    'https://happyflower.vn/app/uploads/2019/11/Dau_SnowWhite_2.jpg',
-};
 
-const AccountScreen = () => {
-  const [account, setAccount] = useState({});
 
-  useEffect(() => {
-    setAccount(ACCOUNT);
-  }, [account]);
+const AccountScreen = (props) => {
+  const getAvatar = () => {
+    if (props.account.avatar) {
+      return `https://secure.gravatar.com/avatar/${props.account.avatar.gravatar.hash}?s=600`
+    }
+    return 'https://i.stack.imgur.com/l60Hf.png'
+  }
+
+  const handleErr = () => {
+    return (
+      <ScrollView style={styles.scrollStyle}>
+        <Image style={styles.avatar} source={{ uri: getAvatar() }} />
+        <View style={styles.detailStyle}>
+          <AccountTextDetail title="ID" isHidden={false} value={props.account.id} placeHolder="ID" />
+          <AccountTextDetail title="Name" isHidden={false} value={props.account.name} placeHolder="Name" />
+          <AccountTextDetail title="Username" isHidden={false} value={props.account.username} placeHolder="Username" />
+        </View>
+      </ScrollView>
+    )
+  }
 
   return (
     <>
       <CustomStatusBar backgroundColor="#90CAF9" barStyle="dark-content" />
       <CustomHeader title="Account" leftButtonName="bars" />
-        <ScrollView style={styles.scrollStyle}>
-            <Image style={styles.avatar} source={{uri: account.image_avatar}} />
-            <AccountTextDetail title="Name" isHidden={false} value={account.name} placeHolder="Your Name"/>
-            <AccountTextDetail title="Password" isHidden={true} value={account.password} placeHolder="Password"/>
-            <AccountTextDetail title="Address" isHidden={false} value={account.address} placeHolder="Address"/>
-            <AccountTextDetail title="Phone" isHidden={false} value={account.phone} placeHolder="Your Phone"/>
-        </ScrollView>
+      {loadHomeDependsOnNetwork(props.availableNetwork, loadHomeDependsOnNetwork, handleErr)}
     </>
   );
 };
+const mapStateToProps = state => {
+  return {
+    account: state.root.account,
+    availableNetwork: state.root.availableNetwork,
+  }
+}
+export default connect(mapStateToProps)(memo(AccountScreen));
 
-export default memo(AccountScreen);
 
 const styles = StyleSheet.create({
   scrollStyle: {
@@ -47,7 +57,7 @@ const styles = StyleSheet.create({
 
   detailStyle: {
     flex: 1,
-    backgroundColor: 'pink',
+    margin: 10,
   },
 
   avatar: {
@@ -55,7 +65,8 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width / 2,
     height: Dimensions.get('window').width / 2,
     resizeMode: 'contain',
-    marginBottom: 20,
+    marginBottom: 15,
     marginTop: 15,
+    borderRadius: 200
   },
 });

@@ -1,4 +1,5 @@
-import React, {memo, useContext} from 'react';
+import React, { memo, useEffect, useLayoutEffect, useState } from 'react';
+import { connect, useDispatch } from 'react-redux'
 import {
   Text,
   StyleSheet,
@@ -6,96 +7,266 @@ import {
   Image,
   Dimensions,
   FlatList,
+  Alert,
+  RefreshControl,
+  Platform
+  ,
 } from 'react-native';
 import CustomHeader from '../../components/CustomHeader';
 import CustomStatusBar from '../../components/CustomStatusBar';
-import {ScrollView} from 'react-native-gesture-handler';
+import DefaultError from '../../components/DefaultError'
+import { ScrollView } from 'react-native-gesture-handler';
 import HMovieList from '../../components/HMovieList';
-import MovieContext from '../../context/MovieContext';
+import { startClock } from 'react-native-reanimated';
+import { startLoading, stopLoading, toggleNetwork, createSessionId } from '../../actions/rootActions'
+import Loading from '../../components/Loading';
+import { MOVIE_TYPE, ROOT_TYPE, ACCOUNT_TYPE } from '../../commons/types'
+import { useNavigationState } from '@react-navigation/native';
+import { Button } from 'react-native-paper';
+import NetInfo from "@react-native-community/netinfo";
+import { loadHomeDependsOnNetwork, showViewAfterLoading } from '../../commons/commonAction';
+import ResponseDefaultErr from '../../components/ResponseDefaultErr';
+import AsyncStorage from '@react-native-community/async-storage';
 
-const DATA1 = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'First Item FirstItem ALice OK ',
-    image_url:
-      'https://cdn.onebauer.media/one/empire-images/features/59e8d795405a5c6805947751/44%20Fear%20and%20Loathing%20in%20Las%20Vegas.jpg?quality=50&width=1000&ratio=1-1&resizeStyle=aspectfit&format=jpg',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Second Item',
-    image_url:
-      'https://cdn.shopify.com/s/files/1/0057/3728/3618/products/4c177c2b7f7bb9a679f089bcb50f844e_3e89eb5d-ffbd-4033-a00f-e595a3ef2e2a_240x360_crop_center.progressive.jpg?v=1573587540',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    title: 'Third Item',
-    image_url:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQl18fcJa9z_X9Tk72IvCBBSSWk6TPG98YYPw&usqp=CAU',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-24343fhf',
-    title: 'Third and Half Item',
-    image_url:
-      'https://www.washingtonpost.com/graphics/2019/entertainment/oscar-nominees-movie-poster-design/img/star-is-born-web.jpg',
-  },
-];
 
-const DATA2 = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'Four Item',
-    image_url:
-      'https://cdn.onebauer.media/one/empire-images/features/59e8d795405a5c6805947751/44%20Fear%20and%20Loathing%20in%20Las%20Vegas.jpg?quality=50&width=1000&ratio=1-1&resizeStyle=aspectfit&format=jpg',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Five Item',
-    image_url:
-      'https://cdn.shopify.com/s/files/1/0057/3728/3618/products/4c177c2b7f7bb9a679f089bcb50f844e_3e89eb5d-ffbd-4033-a00f-e595a3ef2e2a_240x360_crop_center.progressive.jpg?v=1573587540',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    title: 'Six Item',
-    image_url:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQl18fcJa9z_X9Tk72IvCBBSSWk6TPG98YYPw&usqp=CAU',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-24343fhf',
-    title: 'Seven Item',
-    image_url:
-      'https://www.washingtonpost.com/graphics/2019/entertainment/oscar-nominees-movie-poster-design/img/star-is-born-web.jpg',
-  },
-];
+const MovieScreen = (props) => {
+  const dispatch = useDispatch()
 
-const MovieScreen = () => {
-  const movieList = useContext(MovieContext);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [latestMovie, setLatestMovie] = useState({})
+  const [playingMovies, setPlayingMovies] = useState([])
+  const [upcomingMovies, setUpcomingMovies] = useState([])
+  const [topRatedMovies, setTopRatedMovies] = useState([])
+  const [popularMovies, setPopularMovies] = useState([])
+  const [countCompletedApi, setCountCompletedApi] = useState(0)
+  const [latestErrMess, setlatestErrMess] = useState('')
+  const [nowPlayingErrMess, setnowPlayingErrMess] = useState('')
+  const [upcomingErrMess, setupcomingErrMess] = useState('')
+  const [topRatedErrMess, settopRatedErrMess] = useState('')
+  const [popularErrMess, setpopularErrMess] = useState('')
+  const [finishSetupAutoSessionId, setFinishSetupAutoSessionId] = useState('')
 
-  return (
-    <>
-      <CustomStatusBar backgroundColor="#90CAF9" barStyle="dark-content" />
-      <CustomHeader
-        title="Movie"
-        leftButtonName="bars"
-        rightButtonName="search"
-      />
-      <ScrollView showsVerticalScrollIndicator={false}>
+
+  const checkNetworkAndCallApi = () => {
+    if (props.availableNetwork) {
+      dispatch(startLoading())
+      dispatch({
+        type: MOVIE_TYPE.GET_LATEST, payload: {
+          cb: (res) => {
+            if (res.success) {
+              setLatestMovie(res.data)
+            } else {
+              setlatestErrMess(res.errMessage)
+            }
+            setCountCompletedApi(countCompletedApi => countCompletedApi + 1)
+          },
+        }
+      })
+
+      dispatch({
+        type: MOVIE_TYPE.GET_PLAYING, payload: {
+          cb: (res) => {
+            if (res.success) {
+              setPlayingMovies(res.data.results)
+            } else {
+              setnowPlayingErrMess(res.errMessage)
+            }
+            setCountCompletedApi(countCompletedApi => countCompletedApi + 1)
+          }
+        }
+      })
+
+      dispatch({
+        type: MOVIE_TYPE.GET_UPCOMING, payload: {
+          cb: (res) => {
+            if (res.success) {
+              setUpcomingMovies(res.data.results)
+            } else {
+              setupcomingErrMess(res.errMessage)
+            }
+            setCountCompletedApi(countCompletedApi => countCompletedApi + 1)
+          }
+        }
+      })
+
+      dispatch({
+        type: MOVIE_TYPE.GET_TOP_RATED, payload: {
+          cb: (res) => {
+            if (res.success) {
+              setTopRatedMovies(res.data.results)
+            } else {
+              settopRatedErrMess(res.errMessage)
+            }
+            setCountCompletedApi(countCompletedApi => countCompletedApi + 1)
+          }
+        }
+      })
+
+      dispatch({
+        type: MOVIE_TYPE.GET_POPULAR, payload: {
+          cb: (res) => {
+            if (res.success) {
+              setPopularMovies(res.data.results)
+            } else {
+              setpopularErrMess(res.errMessage)
+            }
+            setCountCompletedApi(countCompletedApi => countCompletedApi + 1)
+          }
+        }
+      })
+    }
+  }
+
+
+  const getSessionId = async () => {
+    const sessionId = await AsyncStorage.getItem('sessionId')
+    console.log("session", sessionId);
+    if (sessionId) {
+      dispatch(createSessionId(sessionId))
+      dispatch({
+        type: ACCOUNT_TYPE.GET_ACCOUNT_DETAIL, payload: {
+          sessionId: sessionId,
+          cb: (res) => {
+            setCountCompletedApi(countCompletedApi => countCompletedApi + 1)
+          }
+        }
+      })
+    }
+  }
+
+  useEffect(() => {
+    checkNetworkAndCallApi()
+    getSessionId()
+  }, [props.availableNetwork])
+
+
+  useEffect(() => {
+    if (countCompletedApi === 6) {
+      setCountCompletedApi(0)
+      dispatch(stopLoading())
+    }
+  }, [countCompletedApi])
+
+
+
+  const latestMovieImage = () => {
+    if (latestMovie.backdrop_path) {
+      return `https://image.tmdb.org/t/p/original/${latestMovie.backdrop_path}`
+    }
+    return 'https://image.freepik.com/free-vector/coming-soon-typography-style-vector_53876-56733.jpg'
+  }
+
+  const latestErr = () => {
+    if (latestErrMess) {
+      return <ResponseDefaultErr errMess={latestErrMess} />
+    } else {
+      return (
         <View style={styles.mainThumbContainer}>
-          <Text style={styles.mainMovieText}>New Movie</Text>
           <Image
             style={styles.mainThumb}
             source={{
-              uri:
-                'https://happyflower.vn/app/uploads/2019/11/Dau_SnowWhite_2.jpg',
+              uri: latestMovieImage()
             }}
           />
+          <Text style={styles.mainMovieText}>{latestMovie.title}</Text>
         </View>
-        <HMovieList title="Now Playing" results={DATA1} />
-        <HMovieList title="Upcoming" results={DATA2} />
+      )
+    }
+  }
+
+  const nowPlayingErr = () => {
+    if (nowPlayingErrMess) {
+      return <ResponseDefaultErr errMess={nowPlayingErrMess} />
+    } else {
+      return <HMovieList title="Now Playing" results={playingMovies} />
+    }
+  }
+
+  const upcomingErr = () => {
+    if (upcomingErrMess) {
+      return <ResponseDefaultErr errMess={upcomingErrMess} />
+    } else {
+      return <HMovieList title="Upcoming" results={upcomingMovies} />
+    }
+  }
+
+  const topRatedErr = () => {
+    if (topRatedErrMess) {
+      return <ResponseDefaultErr errMess={topRatedErrMess} />
+    } else {
+      return <HMovieList title="Top Rated" results={topRatedMovies} />
+    }
+  }
+
+  const popularErr = () => {
+    if (popularErrMess) {
+      return <ResponseDefaultErr errMess={popularErrMess} />
+    } else {
+      return <HMovieList title="Most Popular" results={popularMovies} />
+    }
+  }
+
+  const mainView = () => {
+    return (
+      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }} >
+        {latestErr()}
+        {nowPlayingErr()}
+        {upcomingErr()}
+        {topRatedErr()}
+        {popularErr()}
       </ScrollView>
+    )
+
+  }
+
+  const handleErr = () => {
+    if (latestErr && nowPlayingErrMess && upcomingErrMess && topRatedErrMess && popularErrMess) {
+      return <DefaultError mess="Unable to load data" checkNetworkAndCallApi={checkNetworkAndCalApi} />
+    } else {
+      return (
+        <View style={{ flex: 1 }}>
+          {showViewAfterLoading(props.isLoading, mainView)}
+        </View>
+      )
+    }
+  }
+
+  return (
+    <>
+      <View>
+        <CustomStatusBar backgroundColor="#90CAF9" barStyle="dark-content" />
+        <CustomHeader title="Movie" leftButtonName="bars" rightButtonName="search" />
+      </View>
+      {loadHomeDependsOnNetwork(props.availableNetwork, checkNetworkAndCallApi, handleErr)}
+
     </>
   );
 };
-export default memo(MovieScreen);
+
+
+// const mapDispatchToProps = dispatch => ({
+//   // saga
+//   _pressLoginUser1: (email, password) => {
+//       dispatch(startLoading())
+//       dispatch({type: LOGIN, payload: {email, password}})
+//       // dispatch({type: LOGIN, payload: {email: "Alicerose19th", password: "Alicedep1"}})
+//   },
+// })
+
+const mapStateToProps = state => {
+  return {
+    latestMovie: state.movie.latestMovie,
+    playingMovies: state.movie.playingMovies,
+    upcomingMovies: state.movie.upcomingMovies,
+    topRatedMovies: state.movie.topRatedMovies,
+    isLoading: state.root.isLoading,
+    availableNetwork: state.root.availableNetwork,
+    sessionId: state.root.sessionId,
+  }
+}
+
+
+export default connect(mapStateToProps, null)(memo(MovieScreen));
 
 const styles = StyleSheet.create({
   mainThumbContainer: {
@@ -104,14 +275,18 @@ const styles = StyleSheet.create({
   },
 
   mainThumb: {
-    width: Dimensions.get('window').width / 2,
-    height: ((Dimensions.get('window').width / 2) * 4) / 3,
-    resizeMode: 'contain',
+    width: Dimensions.get('window').width,
+    height: (Dimensions.get('window').width) / 2,
+    resizeMode: 'stretch'
   },
 
   mainMovieText: {
     fontSize: 20,
     fontWeight: 'bold',
+    textAlign: 'center',
     padding: 10,
   },
+
+
+
 });

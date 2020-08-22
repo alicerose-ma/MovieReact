@@ -7,6 +7,7 @@ const AccountTextDetail = props => {
     <View style={styles.container}>
       <Text style={styles.textDetailStyle}>{`${props.title} : `}</Text>
       <TextInput
+        editable={false}
         autoCapitalize="none"
         placeholder={props.placeHolder}
         secureTextEntry={props.isHidden}
@@ -28,17 +29,21 @@ const styles = StyleSheet.create({
     paddingVertical: Platform.OS === 'ios' ? 15 : 5,
     borderWidth: StyleSheet.hairlineWidth,
     borderStyle: 'dotted',
+    borderColor:'#90CAF9'
   },
 
   textDetailStyle: {
     flex: 1,
     fontSize: 18,
     fontWeight: 'bold',
+    // textAlign: 'right'
   },
 
   textValueStyle: {
     flex: 2,
     marginLeft: 20,
     fontSize: 18,
+    color: 'black',
+    
   },
 });

@@ -1,5 +1,6 @@
 import React, {memo, useState} from 'react';
-import { View, StyleSheet} from 'react-native';
+import { View, StyleSheet, Platform} from 'react-native';
+import { connect, useDispatch } from 'react-redux'
 import {
   Avatar,
   Title,
@@ -13,8 +14,16 @@ import {
 } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { ROOT_TYPE, ACCOUNT_TYPE } from '../commons/types';
+import { runSaga } from 'redux-saga';
+import { startLoading, stopLoading, toggleNetwork } from '../actions/rootActions'
+import Loading from './Loading';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const CustomDrawerContent = props => {
+
+  // console.log("props", props.cb());
+  const dispatch = useDispatch()
   const drawerArr = [
     {
       key: 'home',
@@ -29,10 +38,10 @@ const CustomDrawerContent = props => {
       naviTo: 'Profile',
     },
     {
-      key: 'nowPlaying',
+      key: 'movieList',
       icon: 'filmstrip',
-      label: 'Now Playing',
-      naviTo: 'NowPlaying',
+      label: 'Movie List',
+      naviTo: 'MovieListScreen',
     },
   ];
 
@@ -53,26 +62,50 @@ const CustomDrawerContent = props => {
     );
   });
 
+  const logout = () => {
+    props.cb("start")
+    // dispatch(startLoading())
+    dispatch({type: ACCOUNT_TYPE.LOGOUT, payload: {
+      sessionId: props.sessionId, 
+      cb: (res) => {
+        // console.log("RES", res);
+        // dispatch(stopLoading())
+        if (res.success) {
+          props.cb("stop")
+          // console.log("nav", props.navigation);
+          props.navigation.popToTop()
+
+        }
+    }}})
+  }
+
+  const getAvatar = () => {
+    if (props.account.avatar) {
+      return `https://secure.gravatar.com/avatar/${props.account.avatar.gravatar.hash}`
+    }
+    return 'https://i.stack.imgur.com/l60Hf.png'
+  }
+
   return (
+    <>
     <View style={{flex: 1}}>
       <DrawerContentScrollView {...props}>
         <View style={{marginBottom: 20}}>
           <View style={styles.userContent}>
             <Avatar.Image
-              source={{
-                uri:
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQTdCoprhau34VQywFn96jHOVdaIbprk6neww&usqp=CAU',
-              }}
-              size={50}
+            source={{
+              uri: getAvatar()
+            }}
+            size={50}
             />
             <View style={styles.userInfo}>
-              <Title>Emily</Title>
-              <Caption>Alien</Caption>
+            <Title>{props.account.name ? props.account.name : '' }</Title>
+              <Caption>{props.account.username ? props.account.username : ''}</Caption>
             </View>
           </View>
           <View style={styles.memberShip}>
-            <Caption style={styles.caption}> Member Card ID</Caption>
-            <Paragraph style={styles.paragraph}>09090909090909090</Paragraph>
+            <Caption style={styles.caption}>Member ID</Caption>
+            <Paragraph style={styles.paragraph}>{props.account.id}</Paragraph>
           </View>
         </View>
         <Drawer.Section>
@@ -85,10 +118,15 @@ const CustomDrawerContent = props => {
             <Icon name="exit-to-app" color={color} size={size} />
           )}
           label="Sign Out"
-          onPress={() => props.navigation.popToTop()}
+          onPress={() =>  { 
+            AsyncStorage.clear();
+            logout() 
+          }}
         />
       </Drawer.Section>
     </View>
+ 
+    </>
   );
 };
 
@@ -110,7 +148,15 @@ const CustomDrawerItem = ({tag, label, icon, navigation, naviTo, active, updateA
   );
 };
 
-export default memo(CustomDrawerContent);
+const mapStateToProps = state => {
+  return {
+    sessionId: state.root.sessionId,
+    isLoading: state.root.isLoading,
+    account: state.root.account,
+  }
+}
+export default connect(mapStateToProps)(memo(CustomDrawerContent));
+
 
 
 const styles = StyleSheet.create({
@@ -125,6 +171,7 @@ const styles = StyleSheet.create({
 
   userInfo: {
     paddingLeft: 20,
+    paddingRight: 80,
   },
 
   bottomDrawerSection: {
@@ -140,10 +187,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginRight: 3,
+    marginLeft: 20
   },
 
   memberShip: {
-    alignItems: 'center',
+    flexDirection: 'row',
     marginTop: 10,
+    justifyContent: 'center',
   },
 });
