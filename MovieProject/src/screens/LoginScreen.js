@@ -56,6 +56,7 @@ const LoginScreen = (props) => {
           if (!res.success) {
             setErrMess(res.errMessage)
           } else {
+            setErrMess(false)
             setValue(username, password, res.data.session_id)
             // dispatch(createSessionId(sessionId))
           }
