@@ -2,9 +2,13 @@ import React from 'react';
 import {Text, View, StyleSheet, Image, Dimensions} from 'react-native';
 import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+
+
 
 const HMovieList = ({title, results}) => {
   const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       <Text numberOfLines={2} style={styles.titleStyle}>
@@ -13,6 +17,7 @@ const HMovieList = ({title, results}) => {
       <FlatList
         horizontal={true}
         showsHorizontalScrollIndicator={false}
+        keyExtractor={item => item.id.toString()}
         data={results}
         renderItem={({item}) => {
           return (
@@ -28,11 +33,23 @@ const HMovieList = ({title, results}) => {
 };
 
 const HMovieItem = ({item}) => {
+  const movieImage = () => {
+    if (item.poster_path) {
+      return `https://image.tmdb.org/t/p/original/${item.poster_path}`
+    }
+    return 'https://www.windhorsepublications.com/wp-content/uploads/2019/11/image-coming-soon-placeholder2.png'
+  }
+
   return (
     <>
       <View style={styles.itemContainer}>
-        <Image style={styles.image} source={{uri: item.image_url}} />
+        <Image style={styles.image} source={{uri: movieImage()}}/>
+        <View style={{flexDirection: 'row', alignItems:'center', justifyContent: 'center' , marginTop: 5, }}>
+          <FontAwesome5Icon name="star" solid color='#e5c100' style={{borderColor: 'black', fontSize: 14 }}/>
+          <Text style={{ marginLeft: 5, fontSize: 15}}>{item.vote_average}</Text>
+        </View>
         <Text style={styles.titleItem}>{item.title}</Text>
+
       </View>
     </>
   );
@@ -44,28 +61,30 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 5,
     marginHorizontal: 10,
-    marginBottom: 20,
   },
 
   titleStyle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 10,
   },
 
   itemContainer: {
     flex: 1,
-    width: 150,
+    width: (Dimensions.get('window').width -100) /2,
   },
+  
   titleItem: {
+    fontWeight: "500",
+    fontSize: 16,
     textAlign: 'center',
     marginTop: 5,
   },
 
   image: {
-    height: 200,
-    resizeMode: 'contain',
+    height: (((Dimensions.get('window').width -100) /2) * 6)/5,
+    resizeMode: 'stretch',
     marginHorizontal: 5,
-    borderRadius: 10
+    borderRadius: 15
   },
 });

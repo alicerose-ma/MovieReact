@@ -17,20 +17,20 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
+    // alignItems: 'center',
     padding: 5,
-    marginHorizontal: 50,
+    marginHorizontal: 15,
   },
 
   textDetailStyle: {
-    flex: 2,
+    flex: 3,
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'right',
   },
 
   textValueStyle: {
-    flex: 3,
+    flex: 4,
     marginLeft: 20,
     fontSize: 16,
   },

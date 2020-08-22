@@ -1,78 +1,41 @@
-import React from 'react';
-import {Text, View, StyleSheet} from 'react-native';
+import React, { memo } from 'react';
+import { connect } from 'react-redux'
+import { View, Text } from 'react-native';
+import { MOVIE_TYPE } from '../../commons/types'
+import ListComponent from '../../components/ListComponent';
 import CustomHeader from '../../components/CustomHeader';
 import CustomStatusBar from '../../components/CustomStatusBar';
-import VMovieList from '../../components/VMovieList';
 
-const MOVIE = [
-  {
-    id: '1',
-    title:
-      'Title Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-    overview:
-      'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-    image_url:
-      'https://cdn.shopify.com/s/files/1/0057/3728/3618/products/4c177c2b7f7bb9a679f089bcb50f844e_3e89eb5d-ffbd-4033-a00f-e595a3ef2e2a_240x360_crop_center.progressive.jpg?v=1573587540',
-  },
-  {
-    id: '2',
-    title: 'Movie 2',
-    overview: 'overview 2',
-    image_url:
-      'https://cdn.shopify.com/s/files/1/0057/3728/3618/products/4c177c2b7f7bb9a679f089bcb50f844e_3e89eb5d-ffbd-4033-a00f-e595a3ef2e2a_240x360_crop_center.progressive.jpg?v=1573587540',
-  },
-  {
-    id: '3',
-    title: 'Movie 2',
-    overview: 'overview 2',
-    image_url:
-      'https://cdn.shopify.com/s/files/1/0057/3728/3618/products/4c177c2b7f7bb9a679f089bcb50f844e_3e89eb5d-ffbd-4033-a00f-e595a3ef2e2a_240x360_crop_center.progressive.jpg?v=1573587540',
-  },
-  {
-    id: '4',
-    title: 'Movie 2',
-    overview: 'overview 2',
-    image_url:
-      'https://cdn.shopify.com/s/files/1/0057/3728/3618/products/4c177c2b7f7bb9a679f089bcb50f844e_3e89eb5d-ffbd-4033-a00f-e595a3ef2e2a_240x360_crop_center.progressive.jpg?v=1573587540',
-  },
-  {
-    id: '5',
-    title: 'Movie 2',
-    overview: 'overview 2',
-    image_url:
-      'https://cdn.shopify.com/s/files/1/0057/3728/3618/products/4c177c2b7f7bb9a679f089bcb50f844e_3e89eb5d-ffbd-4033-a00f-e595a3ef2e2a_240x360_crop_center.progressive.jpg?v=1573587540',
-  },
-];
-
-const WatchListScreen = () => {
+const FavoriteScreen = (props) => {
   return (
     <>
-      <CustomStatusBar backgroundColor="#90CAF9" barStyle="dark-content" />
+      <CustomStatusBar backgroundColor="#90CAF9" />
       <CustomHeader
         title="Favorite"
         leftButtonName="bars"
         rightButtonName="search"
       />
-      <View style={styles.container}>
-        <Text style={styles.mainTitle}>My Favorite List</Text>
-        <VMovieList results={MOVIE} />
-      </View>
+      <ListComponent
+        availableNetwork={props.availableNetwork}
+        type={MOVIE_TYPE.FAVORITE_MOVIE}
+        sessionId={props.sessionId}
+        optionalQuery="&sort_by=created_at.desc"
+        isLoading={props.isLoading}
+        renderListType={props.renderFavorite}
+        name="Favorite"
+      />
     </>
   );
 };
 
-export default WatchListScreen;
+const mapStateToProps = state => {
+  return {
+    isLoading: state.root.isLoading,
+    availableNetwork: state.root.availableNetwork,
+    sessionId: state.root.sessionId,
+    renderFavorite: state.movie.renderFavorite,
+  }
+}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginHorizontal: 15,
-    marginVertical: 10,
-  },
-  mainTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    padding: 10,
-  },
-});
+
+export default connect(mapStateToProps, null)(memo(FavoriteScreen));

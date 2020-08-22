@@ -7,7 +7,6 @@ import {useNavigation} from '@react-navigation/native';
 const CustomHeader = props => {
   const navigation = useNavigation();
 
-  console.log("header rendered sss")
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => props.leftButtonName === 'bars' ? navigation.toggleDrawer() : navigation.goBack()}>
@@ -26,7 +25,7 @@ export default memo(CustomHeader);
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    height: 50,
+    height: 40,
     backgroundColor: '#90CAF9',
     alignItems: 'center',
     justifyContent: 'space-between',

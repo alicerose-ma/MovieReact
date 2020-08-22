@@ -11,8 +11,8 @@ export default class FormInputText extends PureComponent {
           style={styles.inputStyle}  
           placeholder={this.props.placeHolder}
           secureTextEntry={this.props.isHidden}
-          value={this.props.term}
-          onChangeText={this.props.onTermChange}>
+          onChangeText={this.props.onTermChange}
+          placeholderTextColor="gray">
         </TextInput>
       </View>
     );
@@ -31,5 +31,7 @@ const styles = StyleSheet.create({
   inputStyle: {
     fontSize: 18,
     flex: 1,
+    color: 'black',
+    // backgroundColor: 'black'
   },
 });

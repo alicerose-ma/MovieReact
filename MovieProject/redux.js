@@ -17,9 +17,9 @@ const Stack = createStackNavigator();
 const sagaMiddleware = createSagaMiddleware();
 
 
-import { createEpicMiddleware } from 'redux-observable';
-import {rootEpic} from './src/redux/observable/epic';
-const epicMiddleware = createEpicMiddleware(rootEpic);
+// import { createEpicMiddleware } from 'redux-observable';
+// import {rootEpic} from './src/redux/observable/epic';
+// const epicMiddleware = createEpicMiddleware(rootEpic);
 
 const Redux = () => {
   // const store = createStore(reducers, {}, applyMiddleware(ReduxThunk))
