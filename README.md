@@ -5,7 +5,7 @@
 
 ###### Features:
 - [x] Login/Logout 
-- [x] Show Movie List: Now Playing, Upcoming, Top Rated, Most Popular with title, photo Horizonal & Vertical Scroll
+- [x] Show Movie List: Now Playing, Upcoming, Top Rated, Most Popular with title, poster with 2 types: Horizonal & Vertical Scroll
 - [x] Mark/unmark  movie as **Watchlist and Favorite** 
 - [x] Search
 - [x] Movie Detail: Trailer, overview, favorite mark, watchlist mark, custom list mark, detail, cast photo
