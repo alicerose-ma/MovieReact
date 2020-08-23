@@ -4,7 +4,7 @@
 > Backend API providers: MovieDB https://developers.themoviedb.org/3
 
 ###### Features:
-- [x] Login/Logout 
+- [x] Login/Logout (auto-login)
 - [x] Show Movie List: Now Playing, Upcoming, Top Rated, Most Popular with title, poster image with 2 types: Horizonal & Vertical Scroll
 - [x] Mark/unmark  movie as **Watchlist and Favorite** 
 - [x] Search
