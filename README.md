@@ -1,5 +1,5 @@
-# MovieReact
-## Movie Review App built with React Native
+# BeOvie - Movie Review App
+## Movie Review App built with React Native for both android and ios app
 
 > Backend API providers: MovieDB https://developers.themoviedb.org/3
 
