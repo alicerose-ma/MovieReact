@@ -13,6 +13,8 @@
 - [x] Create/delete a **Custom List**
 - [x] Add/remove/clear all movies from **Custom List**
 
+Technology: React Native (javascript), Redux, Redux Saga
+
 
 
 
