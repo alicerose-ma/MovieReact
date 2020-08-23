@@ -5,13 +5,13 @@
 
 ###### Features:
 - Login/Logout 
-- Show Movie List: Now Playing, Upcoming, Top Rated, Most Popular
+- Show Movie List: Now Playing, Upcoming, Top Rated, Most Popular with title, photo Horizonal & Vertical Scroll
 - Mark/unmark  movie as **Watchlist and Favorite** 
 - Search
-- Movie Detail
-- Account Info
-- Create new a **Custom List**
-- Add and remove movie from **Custom List**
+- Movie Detail: Trailer, overview, favorite mark, watchlist mark, custom list mark, detail, cast photo
+- Show Account Info
+- Create/delete a **Custom List**
+- Add/remove/clear all movies from **Custom List**
 
 
 
