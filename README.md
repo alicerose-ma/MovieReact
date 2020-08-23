@@ -12,9 +12,16 @@
 - [x] Show Account Info
 - [x] Create/delete a **Custom List**
 - [x] Add/remove/clear all movies from **Custom List**
+- [x] Rating
 
 Technology: React Native (javascript), Redux, Redux Saga
 
+
+
+> APK installation: [HERE](https://drive.google.com/drive/u/0/folders/1azawDieapbVp0tguAIFNp4w65-lusbPF)
+
+- Download apk file and install for Android Phone
+- Register for an account in mobie DB: https://www.themoviedb.org/signup
 
 
 
